@@ -11,6 +11,13 @@ func (e ErrUnsupportedBase) Error() string {
 	return fmt.Sprintf("base %d is unsupported", e.base)
 }
 
+// ErrEmptyNumberString is a error which is threw when string containing number is empty.
+type ErrEmptyNumberString struct{}
+
+func (ErrEmptyNumberString) Error() string {
+	return "number string is empty"
+}
+
 // ErrIncorrectRune is a error which is threw when rune is not in alphabet.
 type ErrIncorrectRune struct {
 	r rune

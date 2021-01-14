@@ -42,6 +42,10 @@ func convRemaindersToString(idxs []int, alphabet []rune) string {
 
 // Convert custom base number to 10-base number.
 func convXbaseTo10base(num string, alphabet []rune) (int, error) {
+	if num == "" {
+		return 0, ErrEmptyNumberString{}
+	}
+
 	base := len(alphabet)
 
 	res := 0
