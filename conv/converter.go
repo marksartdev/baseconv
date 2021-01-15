@@ -47,6 +47,10 @@ func Convert(num string, from, to Base) (string, error) {
 		return "", fmt.Errorf("converting error: %w", err)
 	}
 
+	if to == Base10 {
+		return strconv.Itoa(dec), nil
+	}
+
 	return conv10baseToXbase(dec, alphabets[to])
 }
 
