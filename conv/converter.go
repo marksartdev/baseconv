@@ -28,6 +28,9 @@ const (
 // Base of number.
 type Base uint
 
+// Alphabet for converting.
+type Alphabet []rune
+
 // Convert number from one base to another.
 func Convert(num string, from, to Base) (string, error) {
 	err := checkBases(from, to)
@@ -51,30 +54,69 @@ func Convert(num string, from, to Base) (string, error) {
 		return strconv.Itoa(dec), nil
 	}
 
-	return conv10baseToXbase(dec, alphabets[to])
+	return conv10baseToXbase(dec, alphabets[to]), nil
 }
 
-// Check supported bases.
-func checkBases(from, to Base) error {
-	fromIsSupported, toIsSupported := false, false
+// ConvertFromCustomBase converts number from custom base using custom alphabet.
+func ConvertFromCustomBase(num string, fromAlphabet Alphabet, to Base) (string, error) {
+	err := checkBases(to)
+	if err != nil {
+		return "", err
+	}
+
+	dec, err := convXbaseTo10base(num, fromAlphabet)
+	if err != nil {
+		return "", fmt.Errorf("converting error: %w", err)
+	}
+
+	if to == Base10 {
+		return strconv.Itoa(dec), nil
+	}
+
+	return conv10baseToXbase(dec, alphabets[to]), nil
+}
+
+// ConvertToCustomBase converts number to custom base using custom alphabet.
+func ConvertToCustomBase(num string, from Base, toAlphabet Alphabet) (string, error) {
+	err := checkBases(from)
+	if err != nil {
+		return "", err
+	}
+
+	dec := 0
+
+	if from == Base10 {
+		dec, err = strconv.Atoi(num)
+	} else {
+		dec, err = convXbaseTo10base(num, alphabets[from])
+	}
+
+	if err != nil {
+		return "", fmt.Errorf("converting error: %w", err)
+	}
+
+	return conv10baseToXbase(dec, toAlphabet), nil
+}
+
+// Check support for bases.
+func checkBases(bases ...Base) error {
+	support := make(map[Base]bool)
+
+	for _, base := range bases {
+		support[base] = false
+	}
 
 	for base := range alphabets {
-		if from == base {
-			fromIsSupported = true
-		}
-
-		if to == base {
-			toIsSupported = true
-		}
-
-		if fromIsSupported && toIsSupported {
-			return nil
+		if _, ok := support[base]; ok {
+			support[base] = true
 		}
 	}
 
-	if !fromIsSupported {
-		return ErrUnsupportedBase{from}
+	for base, isSupported := range support {
+		if !isSupported {
+			return ErrUnsupportedBase{base}
+		}
 	}
 
-	return ErrUnsupportedBase{to}
+	return nil
 }

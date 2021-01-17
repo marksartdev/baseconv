@@ -142,6 +142,86 @@ func getTestCasesForErrors() []testCase {
 		{"bad-dec-string", "A", conv.Base10, conv.Base2, "", "converting error: strconv.Atoi: parsing \"A\": invalid syntax"},
 		{"unsupported-from-base", "100", 11111, conv.Base10, "", "base 11111 is unsupported"},
 		{"unsupported-to-base", "100", conv.Base10, 22222, "", "base 22222 is unsupported"},
-		{"unsupported-both-base", "100", 33333, 44444, "", "base 33333 is unsupported"},
+	}
+}
+
+func TestConvertFromCustomBase(t *testing.T) {
+	t.Parallel()
+
+	alphabet := conv.Alphabet{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'h'}
+
+	testCases := []struct {
+		name string
+		num  string
+		from conv.Alphabet
+		to   conv.Base
+		res  string
+		err  string
+	}{
+		{"base2", "GhGAB", alphabet, conv.Base2, "110111110000001", ""},
+		{"base4", "GhGAB", alphabet, conv.Base4, "12332001", ""},
+		{"base8", "GhGAB", alphabet, conv.Base8, "67601", ""},
+		{"base10", "GhGAB", alphabet, conv.Base10, "28545", ""},
+		{"base16", "GhGAB", alphabet, conv.Base16, "6F81", ""},
+		{"base36", "GhGAB", alphabet, conv.Base36, "M0X", ""},
+		{"base62", "GhGAB", alphabet, conv.Base62, "7QP", ""},
+		{"empty-num-string", "", alphabet, conv.Base10, "", "converting error: number string is empty"},
+		{"bad-num-string", "H", alphabet, conv.Base10, "", "converting error: rune H is not found in alphabet"},
+		{"unsupported-base", "GhGAB", alphabet, 33333, "", "base 33333 is unsupported"},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			res, err := conv.ConvertFromCustomBase(tc.num, tc.from, tc.to)
+			assert.Equal(t, tc.res, res)
+
+			if tc.err != "" || err != nil {
+				assert.EqualError(t, err, tc.err)
+			}
+		})
+	}
+}
+
+func TestConvertToCustomBase(t *testing.T) {
+	t.Parallel()
+
+	alphabet := conv.Alphabet{'A', 'B', 'C', 'D', 'E', 'F', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+
+	testCases := []struct {
+		name string
+		num  string
+		from conv.Base
+		to   conv.Alphabet
+		res  string
+		err  string
+	}{
+		{"base2", "101010100101011", conv.Base2, alphabet, "FFC5", ""},
+		{"base4", "11110223", conv.Base4, alphabet, "FFC5", ""},
+		{"base8", "52453", conv.Base8, alphabet, "FFC5", ""},
+		{"base10", "21803", conv.Base10, alphabet, "FFC5", ""},
+		{"base16", "552B", conv.Base16, alphabet, "FFC5", ""},
+		{"base36", "GTN", conv.Base36, alphabet, "FFC5", ""},
+		{"base62", "5ff", conv.Base62, alphabet, "FFC5", ""},
+		{"empty-num-string", "", conv.Base2, alphabet, "", "converting error: number string is empty"},
+		{"bad-num-string", "h", conv.Base2, alphabet, "", "converting error: rune h is not found in alphabet"},
+		{"bad-dec-string", "h", conv.Base10, alphabet, "", "converting error: strconv.Atoi: parsing \"h\": invalid syntax"},
+		{"unsupported-base", "5ff", 44444, alphabet, "", "base 44444 is unsupported"},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			res, err := conv.ConvertToCustomBase(tc.num, tc.from, tc.to)
+			assert.Equal(t, tc.res, res)
+
+			if tc.err != "" || err != nil {
+				assert.EqualError(t, err, tc.err)
+			}
+		})
 	}
 }

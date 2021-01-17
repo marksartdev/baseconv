@@ -7,7 +7,7 @@ import (
 )
 
 // Convert 10-base number to custom base number.
-func conv10baseToXbase(num int, alphabet []rune) (string, error) {
+func conv10baseToXbase(num int, alphabet Alphabet) string {
 	base := len(alphabet)
 
 	if num < 0 {
@@ -26,11 +26,11 @@ func conv10baseToXbase(num int, alphabet []rune) (string, error) {
 		remainders = append([]int{remainder}, remainders...)
 	}
 
-	return convRemaindersToString(remainders, alphabet), nil
+	return convRemaindersToString(remainders, alphabet)
 }
 
 // Convert indexes of alphabet symbols to string.
-func convRemaindersToString(idxs []int, alphabet []rune) string {
+func convRemaindersToString(idxs []int, alphabet Alphabet) string {
 	res := ""
 
 	for _, idx := range idxs {
@@ -41,7 +41,7 @@ func convRemaindersToString(idxs []int, alphabet []rune) string {
 }
 
 // Convert custom base number to 10-base number.
-func convXbaseTo10base(num string, alphabet []rune) (int, error) {
+func convXbaseTo10base(num string, alphabet Alphabet) (int, error) {
 	if num == "" {
 		return 0, ErrEmptyNumberString{}
 	}

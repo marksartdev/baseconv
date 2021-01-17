@@ -1,7 +1,7 @@
 package conv
 
 //nolint:gochecknoglobals // it is constant.
-var alphabets = map[Base][]rune{
+var alphabets = map[Base]Alphabet{
 	Base2:  {'0', '1'},
 	Base4:  {'0', '1', '2', '3'},
 	Base8:  {'0', '1', '2', '3', '4', '5', '6', '7'},
