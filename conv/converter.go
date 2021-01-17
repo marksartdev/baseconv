@@ -1,4 +1,4 @@
-// Package conv convert number base.
+// Package conv provides functions for converting numbers from one base to another.
 // Supported 2-, 4-, 8-, 10-, 16-, 36-, 62-base numbers.
 // Also is able to convert numbers with custom alphabets.
 package conv
@@ -28,7 +28,7 @@ const (
 // Base of number.
 type Base uint
 
-// Convert number from one base to another base.
+// Convert number from one base to another.
 func Convert(num string, from, to Base) (string, error) {
 	err := checkBases(from, to)
 	if err != nil {
